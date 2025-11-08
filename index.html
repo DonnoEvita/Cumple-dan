@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎁 Para Daniel 💖</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffd8ef;
+    font-family: "Comic Sans MS", cursive;
+    overflow: hidden;
+    text-align: center;
+  }
+
+  canvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    display: none;
+  }
+
+  .container { position: relative; z-index: 2; }
+
+  #tapText {
+    font-size: 22px;
+    color: #ff007f;
+    text-shadow: 0 0 8px white;
+    margin-bottom: 12px;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+  }
+
+  .gift-box {
+    width: 170px; height: 170px;
+    background: #ff8ac2;
+    border-radius: 12px;
+    position: relative;
+    cursor: pointer;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    animation: bounce 1.5s infinite ease-in-out;
+    margin: auto;
+  }
+
+  @keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .lid {
+    width: 100%; height: 40px;
+    background: #ff4da6;
+    position: absolute; top: 0;
+    border-radius: 12px 12px 0 0;
+    transform-origin: bottom center;
+    transition: transform 0.8s ease;
+  }
+
+  .ribbon.vertical, .ribbon.horizontal {
+    position: absolute;
+    background: #fff;
+  }
+
+  .ribbon.vertical { width: 14px; height: 100%; left: 78px; top: 0; }
+  .ribbon.horizontal { width: 100%; height: 14px; top: 78px; left: 0; }
+
+  .cake {
+    display: none;
+    width: 230px;
+    margin: 20px auto;
+    animation: bounceCake 2s infinite ease-in-out;
+  }
+
+  @keyframes bounceCake {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  .texts {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+    color: #ff1493;
+    text-shadow: 0 0 6px #fff;
+    font-size: 22px;
+  }
+
+  .texts.visible { opacity: 1; }
+
+  .gift-box.open .lid {
+    transform: rotateX(-120deg) translateY(-30px);
+  }
+
+  #loveText {
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff69b4;
+    text-shadow: 0 0 8px white;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="container">
+  <div id="tapText">✨ Tocame 🎁 ✨</div>
+
+  <div class="gift-box" id="giftBox">
+    <div class="lid"></div>
+    <div class="ribbon vertical"></div>
+    <div class="ribbon horizontal"></div>
+  </div>
+
+  <!-- 💖 Texto arriba -->
+  <div id="loveText" class="texts">I love you, Daniel 💕</div>
+
+  <!-- 🎂 Torta animada -->
+  <img id="cake" class="cake" src="https://i.pinimg.com/originals/18/47/87/184787c9f2b11830289f817719ce21c1.gif" alt="Torta de cumpleaños animada">
+
+  <!-- 🎉 Texto abajo -->
+  <div id="texts" class="texts">🎉 Feliz cumpleaños, mi amor 🎂</div>
+</div>
+
+<!-- 🎹 Música de piano -->
+<audio id="music" preload="auto">
+  <source src="https://files.catbox.moe/9g3d4y.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const giftBox = document.getElementById("giftBox");
+const cake = document.getElementById("cake");
+const texts = document.getElementById("texts");
+const loveText = document.getElementById("loveText");
+const canvas = document.getElementById("fireworks");
+const music = document.getElementById("music");
+const tapText = document.getElementById("tapText");
+
+giftBox.addEventListener("click", () => {
+  giftBox.classList.add("open");
+  setTimeout(() => {
+    giftBox.style.display = "none";
+    tapText.style.display = "none";
+    loveText.classList.add("visible");
+    cake.style.display = "block";
+    texts.classList.add("visible");
+    canvas.style.display = "block";
+    document.body.style.background = "#000";
+    music.play();
+  }, 900);
+});
+
+/* Fuegos artificiales */
+const ctx = canvas.getContext("2d");
+let W = window.innerWidth;
+let H = window.innerHeight;
+canvas.width = W;
+canvas.height = H;
+
+const particles = [];
+function random(min,max){return Math.random()*(max-min)+min;}
+function createFirework(){
+  const x = random(0,W);
+  const y = random(0,H/2);
+  const color = `hsl(${random(0,360)},100%,60%)`;
+  for(let i=0;i<50;i++){
+    particles.push({
+      x,y,
+      angle: random(0,Math.PI*2),
+      speed: random(2,6),
+      radius: random(2,4),
+      life:100,
+      color
+    });
+  }
+}
+function draw(){
+  ctx.fillStyle="rgba(0,0,0,0.2)";
+  ctx.fillRect(0,0,W,H);
+  particles.forEach((p,i)=>{
+    const vx = Math.cos(p.angle)*p.speed;
+    const vy = Math.sin(p.angle)*p.speed;
+    p.x+=vx; p.y+=vy+1;
+    p.life--;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.radius,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.fill();
+    if(p.life<=0) particles.splice(i,1);
+  });
+  if(Math.random()<0.08) createFirework();
+  requestAnimationFrame(draw);
+}
+draw();
+</script>
+</body>
+</html>
